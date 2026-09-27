@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Upload skin photos from different days and get a short before-and-after reel showing what changed.">
+<title>Skin Morph</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+  :root {
+    --ground: #F4F6F3;
+    --surface: #FFFFFF;
+    --ink: #17191B;
+    --muted: #5E6660;
+    --line: #D8DDD6;
+    --accent: #2F7D32;
+    --glow: #A6E36B;
+    --reel: #121413;
+    --reel-2: #1D211E;
+    --skin: #E9C2A6;
+    --skin-2: #D9A98A;
+    --serif: "Instrument Serif", Georgia, serif;
+    --sans: "Manrope", "Helvetica Neue", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --ground: #0F1110; --surface: #171A18; --ink: #E8ECE7; --muted: #99A29B; --line: #2A2F2B;
+      --accent: #A6E36B;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--ground); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.6; padding-inline: 20px; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1040px; margin: 0 auto; }
+  h1, h2 { font-family: var(--serif); font-weight: 400; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+  p { margin: 0; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  header { display: flex; justify-content: space-between; align-items: center; padding-block: 22px; }
+  .brand { font-weight: 700; letter-spacing: -0.01em; display: flex; align-items: center; gap: 10px; }
+  .brand i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--accent); display: inline-block; }
+  header a.cta-sm { font-size: 14px; font-weight: 600; text-decoration: none; color: var(--accent); }
+
+  .hero { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); gap: 56px; align-items: center; padding-block: 48px 72px; }
+  .eyebrow { font-size: 13px; font-weight: 600; color: var(--accent); letter-spacing: 0.04em; text-transform: uppercase; }
+  .hero h1 { font-size: clamp(48px, 7.4vw, 88px); line-height: 0.95; margin-top: 14px; }
+  .hero h1 em { color: var(--accent); }
+  .hero .lede { font-size: 19px; color: var(--muted); max-width: 32em; margin-top: 22px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; font: 600 16px/1 var(--sans); padding: 16px 22px; border-radius: 999px; border: 0; background: var(--ink); color: var(--ground); text-decoration: none; cursor: pointer; margin-top: 30px; }
+  .btn:hover { background: var(--accent); color: #fff; }
+  .note { font-size: 13px; color: var(--muted); margin-top: 14px; }
+
+  /* reel mock */
+  .phone { width: 100%; max-width: 300px; aspect-ratio: 9 / 16; margin-inline: auto; background: var(--reel); border-radius: 28px; padding: 14px; display: grid; grid-template-rows: 1fr auto; gap: 12px; box-shadow: 0 30px 60px -30px rgba(0,0,0,.45); }
+  .faces { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .face { position: relative; background: var(--reel-2); border-radius: 12px; overflow: hidden; }
+  .face svg { width: 100%; height: 100%; display: block; }
+  .face .tag { position: absolute; top: 8px; left: 8px; font-size: 10px; font-weight: 700; color: #fff; background: rgba(0,0,0,.45); padding: 2px 7px; border-radius: 999px; }
+  .ring { fill: none; stroke: var(--glow); stroke-width: 1.6; }
+  @media (prefers-reduced-motion: no-preference) {
+    .ring { animation: ring 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+    .ring:nth-of-type(2) { animation-delay: .3s; } .ring:nth-of-type(3) { animation-delay: .6s; } .ring:nth-of-type(4) { animation-delay: .9s; } .ring:nth-of-type(5) { animation-delay: 1.2s; }
+  }
+  @keyframes ring { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .55; transform: scale(1.08); } }
+  .stats { color: #fff; display: grid; gap: 10px; padding: 4px 4px 6px; }
+  .big { display: flex; align-items: baseline; gap: 8px; }
+  .big b { font-size: 40px; line-height: 1; color: var(--glow); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .big span { font-size: 14px; color: #C9D0CA; }
+  .bar { display: grid; grid-template-columns: 64px 1fr 36px; gap: 8px; align-items: center; font-size: 11px; color: #C9D0CA; }
+  .bar div { height: 5px; background: #2B302C; border-radius: 3px; overflow: hidden; }
+  .bar div i { display: block; height: 100%; background: var(--glow); border-radius: 3px; }
+  .bar em { font-style: normal; color: var(--glow); font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+  .caption { text-align: center; font-size: 12px; color: var(--muted); margin-top: 12px; }
+
+  section { padding-block: 64px; border-top: 1px solid var(--line); }
+  section h2 { font-size: clamp(34px, 4.4vw, 50px); line-height: 1.02; }
+  .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; margin-top: 36px; list-style: none; padding: 0; counter-reset: s; }
+  .steps li { counter-increment: s; }
+  .steps li::before { content: counter(s); display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--accent); color: var(--accent); font-weight: 700; font-size: 14px; margin-bottom: 14px; }
+  .steps h3 { margin: 0; font-size: 18px; font-weight: 700; }
+  .steps p { color: var(--muted); margin-top: 6px; font-size: 15px; }
+
+  .inside { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin-top: 36px; border-top: 1px solid var(--line); }
+  .inside div { padding: 18px 18px 18px 0; border-bottom: 1px solid var(--line); }
+  .inside b { display: block; font-size: 15px; }
+  .inside span { color: var(--muted); font-size: 14px; }
+
+  /* upload */
+  .try { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 48px; align-items: start; }
+  .try p.sub { color: var(--muted); margin-top: 14px; max-width: 30em; }
+  form { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px; display: grid; gap: 18px; }
+  .drop { display: grid; place-items: center; text-align: center; gap: 6px; padding: 28px 16px; border: 1.5px dashed var(--line); border-radius: 12px; cursor: pointer; }
+  .drop:hover, .drop.over { border-color: var(--accent); }
+  .drop strong { font-size: 16px; }
+  .drop span { font-size: 13px; color: var(--muted); }
+  .drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+  .thumbs { display: flex; gap: 8px; flex-wrap: wrap; }
+  .thumbs img { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); }
+  label.f { display: grid; gap: 6px; font-size: 14px; font-weight: 600; }
+  label.f small { font-weight: 400; color: var(--muted); }
+  input[type="email"] { font: 16px var(--sans); padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--ground); color: var(--ink); }
+  form .btn { margin-top: 0; justify-content: center; }
+  form .btn[disabled] { opacity: .5; cursor: not-allowed; }
+  .err { color: #C0392B; font-size: 14px; }
+  .done { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 28px 24px; display: grid; gap: 10px; }
+  .done h3 { margin: 0; font-family: var(--serif); font-weight: 400; font-size: 30px; line-height: 1.1; }
+  .done p { color: var(--muted); }
+  .done button { justify-self: start; background: none; border: 0; padding: 0; color: var(--accent); font: 600 14px var(--sans); cursor: pointer; }
+  .privacy { font-size: 13px; color: var(--muted); }
+
+  footer { padding-block: 28px 40px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .hp { position: absolute; left: -9999px; }
+
+  @media (max-width: 820px) {
+    .hero, .try { grid-template-columns: 1fr; gap: 36px; }
+    .hero { padding-block: 24px 56px; }
+    .phone { max-width: 250px; }
+    .steps { grid-template-columns: 1fr; gap: 24px; }
+    .inside { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 480px) { body { padding-inline: 16px; } section { padding-block: 48px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="brand"><i aria-hidden="true"></i>Skin Morph</span>
+    <a class="cta-sm" href="#try">Try it</a>
+  </header>
+
+  <div class="hero">
+    <div>
+      <span class="eyebrow">Before & after, done for you</span>
+      <h1>See what your skincare is <em>actually</em> doing.</h1>
+      <p class="lede">Upload selfies from different days. Skin Morph lines up your face, finds the spots that changed, and turns them into a 30-second reel you can share.</p>
+      <a class="btn" href="#try">Make my reel →</a>
+      <p class="note">Works with 2 to 4 photos. Free while in beta.</p>
+    </div>
+    <div>
+      <div class="phone" role="img" aria-label="Example reel: Day 1 and Day 14 side by side, with circles on improved areas, 13% clearer overall.">
+        <div class="faces">
+          <div class="face">
+            <span class="tag">Day 1</span>
+            <svg viewBox="0 0 100 150" aria-hidden="true">
+              <ellipse cx="50" cy="80" rx="30" ry="40" fill="var(--skin-2)"/>
+              <path d="M18 70 Q20 28 50 26 Q80 28 82 70 Q78 44 50 42 Q22 44 18 70Z" fill="#3A2A22"/>
+              <ellipse cx="39" cy="76" rx="4" ry="2" fill="#2A211C"/><ellipse cx="61" cy="76" rx="4" ry="2" fill="#2A211C"/>
+              <path d="M44 104 Q50 107 56 104" stroke="#8C5A48" stroke-width="1.6" fill="none"/>
+              <circle cx="34" cy="92" r="2" fill="#B8735E"/><circle cx="66" cy="90" r="2.2" fill="#B8735E"/><circle cx="62" cy="96" r="1.6" fill="#B8735E"/><circle cx="50" cy="62" r="1.8" fill="#B8735E"/><circle cx="40" cy="98" r="1.4" fill="#B8735E"/>
+            </svg>
+          </div>
+          <div class="face">
+            <span class="tag">Day 14</span>
+            <svg viewBox="0 0 100 150" aria-hidden="true">
+              <ellipse cx="50" cy="80" rx="30" ry="40" fill="var(--skin)"/>
+              <path d="M18 70 Q20 28 50 26 Q80 28 82 70 Q78 44 50 42 Q22 44 18 70Z" fill="#3A2A22"/>
+              <ellipse cx="39" cy="76" rx="4" ry="2" fill="#2A211C"/><ellipse cx="61" cy="76" rx="4" ry="2" fill="#2A211C"/>
+              <path d="M44 104 Q50 107 56 104" stroke="#8C5A48" stroke-width="1.6" fill="none"/>
+              <circle class="ring" cx="34" cy="92" r="7"/><circle class="ring" cx="65" cy="92" r="8"/><circle class="ring" cx="50" cy="62" r="6"/><circle class="ring" cx="40" cy="100" r="5"/><circle class="ring" cx="58" cy="108" r="5"/>
+            </svg>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="big"><b>13%</b><span>clearer in 14 days</span></div>
+          <div class="bar">Texture<div><i style="width:58%"></i></div><em>23%</em></div>
+          <div class="bar">Redness<div><i style="width:40%"></i></div><em>16%</em></div>
+          <div class="bar">Spots<div><i style="width:28%"></i></div><em>11%</em></div>
+        </div>
+      </div>
+      <p class="caption">Example frame. Your reel is a 9:16 video.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>Three steps, no editing.</h2>
+    <ol class="steps">
+      <li><h3>Upload your photos</h3><p>2 to 4 front-facing selfies, from your first day to today. Same lighting helps.</p></li>
+      <li><h3>We find what changed</h3><p>Your face is mapped and aligned across days, then compared spot by spot to find areas that improved.</p></li>
+      <li><h3>Get your reel</h3><p>A vertical video with circles on each improvement, a 3D face scan, and your results by concern.</p></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>What's in the reel</h2>
+    <div class="inside">
+      <div><b>The hook</b><span>"I found 7 changes"</span></div>
+      <div><b>Day 1 → today</b><span>A morph through every photo</span></div>
+      <div><b>3D face scan</b><span>A mesh sweep, with redness mapped</span></div>
+      <div><b>The payoff</b><span>% clearer, per concern</span></div>
+    </div>
+  </section>
+
+  <section id="try">
+    <div class="try">
+      <div>
+        <h2>Try it with your photos</h2>
+        <p class="sub">Pick your photos in order, oldest first. Leave your email and we'll send your reel when it's ready.</p>
+      </div>
+      <div id="formBox">
+        <form id="uploadForm" novalidate>
+          <label class="drop" id="drop" for="photos">
+            <strong>Choose photos</strong>
+            <span>or drag them here · 2 to 4 images</span>
+            <input type="file" id="photos" name="photos" accept="image/*" multiple>
+          </label>
+          <div class="thumbs" id="thumbs" aria-live="polite"></div>
+          <label class="f" for="email">Email <small>optional, to get your reel</small>
+            <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email">
+          </label>
+          <input class="hp" type="text" id="website" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <p class="err" id="err" hidden></p>
+          <button class="btn" id="submitBtn" type="submit">Make my reel →</button>
+          <p class="privacy">Your photos stay on your device and are not uploaded.</p>
+        </form>
+        <div class="done" id="done" hidden>
+          <h3>We're having some trouble right now.</h3>
+          <p>Sorry about that. Please come back soon and try again.</p>
+          <p id="doneEmail" hidden>We'll email you as soon as it's working again.</p>
+          <button type="button" id="again">Start over</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Skin Morph · beta</span>
+    <span>Made by <a href="https://mgupta07.github.io">Mohit Gupta</a></span>
+  </footer>
+</div>
+
+<script>
+(function () {
+  // Where notifications go. After FormSubmit activation, you can swap the
+  // address for the random alias FormSubmit gives you, to hide it from the page source.
+  var NOTIFY = 'https://formsubmit.co/ajax/mgupta.ncsu@gmail.com';
+
+  var input = document.getElementById('photos');
+  var drop = document.getElementById('drop');
+  var thumbs = document.getElementById('thumbs');
+  var form = document.getElementById('uploadForm');
+  var err = document.getElementById('err');
+  var btn = document.getElementById('submitBtn');
+  var files = [];
+
+  function show(list) {
+    files = Array.prototype.filter.call(list, function (f) { return /^image\//.test(f.type); }).slice(0, 4);
+    thumbs.innerHTML = '';
+    files.forEach(function (f) {
+      var img = document.createElement('img');
+      img.alt = f.name;
+      img.src = URL.createObjectURL(f);
+      thumbs.appendChild(img);
+    });
+    err.hidden = true;
+  }
+  input.addEventListener('change', function () { show(input.files); });
+  ['dragenter', 'dragover'].forEach(function (e) { drop.addEventListener(e, function (ev) { ev.preventDefault(); drop.classList.add('over'); }); });
+  ['dragleave', 'drop'].forEach(function (e) { drop.addEventListener(e, function (ev) { ev.preventDefault(); drop.classList.remove('over'); }); });
+  drop.addEventListener('drop', function (ev) { show(ev.dataTransfer.files); });
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    if (files.length < 2) { err.textContent = 'Please choose at least 2 photos, oldest first.'; err.hidden = false; return; }
+    var email = document.getElementById('email').value.trim();
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = 'That email looks incomplete. Check it, or leave it blank.'; err.hidden = false; return; }
+    btn.disabled = true; btn.textContent = 'Working…';
+
+    var payload = {
+      _subject: 'Skin Morph: someone tried to make a reel',
+      _template: 'table',
+      _captcha: 'false',
+      _honey: document.getElementById('website').value,
+      event: 'Tried to make a reel',
+      photos_selected: String(files.length),
+      visitor_email: email || '(not given)',
+      time: new Date().toString(),
+      language: navigator.language || '',
+      page: location.href
+    };
+    var finish = function () {
+      document.getElementById('uploadForm').hidden = true;
+      document.getElementById('doneEmail').hidden = !email;
+      document.getElementById('done').hidden = false;
+    };
+    fetch(NOTIFY, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(payload) })
+      .then(finish, finish);
+  });
+
+  document.getElementById('again').addEventListener('click', function () {
+    form.reset(); show([]);
+    btn.disabled = false; btn.textContent = 'Make my reel →';
+    document.getElementById('done').hidden = true;
+    form.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>
